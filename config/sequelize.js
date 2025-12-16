@@ -1,84 +1,16 @@
 // config/sequelize.js
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
-dotenv.config({ override: true });
 
-// Support both local and remote database configurations.
-// Local settings (DB_USER, DB_PASS, DB_NAME, DB_HOST) take priority if set.
-// Falls back to remote credentials (DB_Username, DB_Password, DB_Database, etc.) if local not present.
-const cleanEnvValue = (value) => {
-  if (!value) return undefined;
-  const trimmed = String(value).trim();
-  if (!trimmed) return undefined;
-  if (trimmed.includes("${{")) return undefined;
-  return trimmed;
-};
+dotenv.config();
 
-const connectionUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
+if (!process.env.MYSQL_URL) {
+  throw new Error("❌ MYSQL_URL is not defined in environment variables");
+}
 
-const parseConnectionUrl = (urlString) => {
-  try {
-    const url = new URL(urlString);
-    return {
-      database: url.pathname?.replace(/^\//, ""),
-      user: decodeURIComponent(url.username || ""),
-      password: decodeURIComponent(url.password || ""),
-      host: url.hostname,
-      port: url.port ? Number(url.port) : undefined,
-    };
-  } catch {
-    return null;
-  }
-};
-
-const parsedUrl = connectionUrl ? parseConnectionUrl(connectionUrl) : null;
-
-const DB_NAME =
-  cleanEnvValue(process.env.DB_NAME) ||
-  cleanEnvValue(process.env.DB_Database) ||
-  parsedUrl?.database ||
-  "u929535174_elsy";
-
-const DB_USER =
-  cleanEnvValue(process.env.DB_USER) ||
-  cleanEnvValue(process.env.DB_Username) ||
-  parsedUrl?.user ||
-  "u929535174_sara";
-
-const DB_PASSWORD =
-  cleanEnvValue(process.env.DB_PASS) ||
-  cleanEnvValue(process.env.DB_Password) ||
-  parsedUrl?.password ||
-  "FaithforLove@123321";
-const DB_HOST =
-  cleanEnvValue(process.env.DB_HOST) || // Local/Remote (localhost or srv909.hstgr.io)
-  cleanEnvValue(process.env.Host) ||
-  cleanEnvValue(process.env.host) ||
-  parsedUrl?.host ||
-  "srv909.hstgr.io";
-const DB_PORT = Number(
-  cleanEnvValue(process.env.DB_PORT) || // Explicit DB port
-  cleanEnvValue(process.env.DBPORT) || // Alt naming
-    parsedUrl?.port ||
-  3306 // Default MySQL port
-);
-
-export const dbConfig = {
-  database: DB_NAME,
-  user: DB_USER,
-  host: DB_HOST,
-  port: DB_PORT,
-};
-
-const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-  host: DB_HOST,
+const sequelize = new Sequelize(process.env.MYSQL_URL, {
   dialect: "mysql",
-  port: DB_PORT,
   logging: false,
-  define: {
-    timestamps: true,
-    underscored: false,
-  },
   pool: {
     max: 10,
     min: 0,
