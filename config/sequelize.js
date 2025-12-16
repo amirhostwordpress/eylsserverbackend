@@ -6,6 +6,14 @@ dotenv.config({ override: true });
 // Support both local and remote database configurations.
 // Local settings (DB_USER, DB_PASS, DB_NAME, DB_HOST) take priority if set.
 // Falls back to remote credentials (DB_Username, DB_Password, DB_Database, etc.) if local not present.
+const cleanEnvValue = (value) => {
+  if (!value) return undefined;
+  const trimmed = String(value).trim();
+  if (!trimmed) return undefined;
+  if (trimmed.includes("${{")) return undefined;
+  return trimmed;
+};
+
 const connectionUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
 const parseConnectionUrl = (urlString) => {
@@ -26,31 +34,31 @@ const parseConnectionUrl = (urlString) => {
 const parsedUrl = connectionUrl ? parseConnectionUrl(connectionUrl) : null;
 
 const DB_NAME =
-  process.env.DB_NAME ||
-  process.env.DB_Database ||
+  cleanEnvValue(process.env.DB_NAME) ||
+  cleanEnvValue(process.env.DB_Database) ||
   parsedUrl?.database ||
   "u929535174_elsy";
 
 const DB_USER =
-  process.env.DB_USER ||
-  process.env.DB_Username ||
+  cleanEnvValue(process.env.DB_USER) ||
+  cleanEnvValue(process.env.DB_Username) ||
   parsedUrl?.user ||
   "u929535174_sara";
 
 const DB_PASSWORD =
-  process.env.DB_PASS ||
-  process.env.DB_Password ||
+  cleanEnvValue(process.env.DB_PASS) ||
+  cleanEnvValue(process.env.DB_Password) ||
   parsedUrl?.password ||
   "FaithforLove@123321";
 const DB_HOST =
-  process.env.DB_HOST || // Local/Remote (localhost or srv909.hstgr.io)
-  process.env.Host ||
-  process.env.host ||
+  cleanEnvValue(process.env.DB_HOST) || // Local/Remote (localhost or srv909.hstgr.io)
+  cleanEnvValue(process.env.Host) ||
+  cleanEnvValue(process.env.host) ||
   parsedUrl?.host ||
   "srv909.hstgr.io";
 const DB_PORT = Number(
-  process.env.DB_PORT || // Explicit DB port
-  process.env.DBPORT || // Alt naming
+  cleanEnvValue(process.env.DB_PORT) || // Explicit DB port
+  cleanEnvValue(process.env.DBPORT) || // Alt naming
     parsedUrl?.port ||
   3306 // Default MySQL port
 );
