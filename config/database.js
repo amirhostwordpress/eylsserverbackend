@@ -1,4 +1,13 @@
-// config/database.js
-import sequelize, { connectDB } from "./sequelize.js";
+import sequelize from "./sequelize.js";
 
-export { sequelize, connectDB };
+const connectDB = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ MySQL connected successfully");
+  } catch (error) {
+    console.error("❌ MySQL connection failed:", error.message);
+    process.exit(1);
+  }
+};
+
+export default connectDB;
