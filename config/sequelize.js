@@ -1,62 +1,63 @@
 // config/sequelize.js
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
+
 dotenv.config({ override: true });
 
-// Support both local and remote database configurations.
-// Local settings (DB_USER, DB_PASS, DB_NAME, DB_HOST) take priority if set.
-// Falls back to remote credentials (DB_Username, DB_Password, DB_Database, etc.) if local not present.
 const DB_NAME =
   process.env.DB_NAME ||
   process.env.DB_Database ||
-  "u929535174_elsy";
+  process.env.MYSQLDATABASE;
 
 const DB_USER =
   process.env.DB_USER ||
   process.env.DB_Username ||
-  "u929535174_sara";
+  process.env.MYSQLUSER;
 
 const DB_PASSWORD =
   process.env.DB_PASS ||
   process.env.DB_Password ||
-  "FaithforLove@123321";
+  process.env.MYSQLPASSWORD;
+
 const DB_HOST =
-  process.env.DB_HOST || // Local/Remote (localhost or srv909.hstgr.io)
+  process.env.DB_HOST ||
   process.env.Host ||
   process.env.host ||
-  "srv909.hstgr.io";
+  process.env.MYSQLHOST;
+
 const DB_PORT = Number(
-  process.env.DB_PORT || // Explicit DB port
-  process.env.DBPORT || // Alt naming
-  3306 // Default MySQL port
+  process.env.DB_PORT ||
+  process.env.DBPORT ||
+  process.env.MYSQLPORT ||
+  3306
 );
 
-export const dbConfig = {
-  database: DB_NAME,
-  user: DB_USER,
-  host: DB_HOST,
-  port: DB_PORT,
-};
+if (!DB_NAME || !DB_USER || !DB_PASSWORD || !DB_HOST) {
+  throw new Error("❌ Database environment variables are missing");
+}
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
-  dialect: "mysql",
   port: DB_PORT,
+  dialect: "mysql",
   logging: false,
+
   define: {
     timestamps: true,
-    underscored: false,
   },
+
   pool: {
     max: 10,
     min: 0,
     acquire: 30000,
     idle: 10000,
   },
+
   dialectOptions: {
     dateStrings: true,
     typeCast: true,
   },
+
   timezone: "+05:30",
 });
 
