@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDB } from "./config/database.js";
 
+
+
 // Routes
 import subscriptionRoutes from "./routes/subscription.routes.js";
 import authRoutes from "./routes/auth.routes.js";

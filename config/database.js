@@ -1,6 +1,6 @@
 import sequelize from "./sequelize.js";
 
-const connectDB = async () => {
+export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ MySQL connected successfully");
@@ -9,5 +9,3 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
-
-export default connectDB;
