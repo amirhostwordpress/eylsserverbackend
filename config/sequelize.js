@@ -7,7 +7,6 @@ dotenv.config({ override: true });
 let sequelize;
 
 if (process.env.MYSQL_URL) {
-  // ✅ Railway / Production (recommended)
   sequelize = new Sequelize(process.env.MYSQL_URL, {
     dialect: "mysql",
     logging: false,
@@ -19,7 +18,6 @@ if (process.env.MYSQL_URL) {
     },
   });
 } else {
-  // ✅ Local / Manual configuration fallback
   sequelize = new Sequelize(
     process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE,
     process.env.MYSQLUSER,
@@ -33,13 +31,12 @@ if (process.env.MYSQL_URL) {
   );
 }
 
-// ✅ Test connection
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ MySQL connected successfully");
   } catch (error) {
-    console.error("❌ Unable to connect to the database:", error.message);
+    console.error("❌ MySQL connection failed:", error.message);
     process.exit(1);
   }
 };
